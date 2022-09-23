@@ -11,7 +11,7 @@ const NewTaskForm = (props) => {
   };
 
   const onSubmit = (event) => {
-    if (label.trim().length == 0) {
+    if (label.trim().length === 0) {
       return alert('type smth')
     }
     event.preventDefault();
