@@ -1,124 +1,69 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 
-export default class Timer extends Component {
-  static defaultProps = {
-    timerData: {
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      intervalId: 0,
-    },
-  };
+const Timer = () => {
+  const [hours , setHours] = useState(0);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const [intervalId, setIntervalId] = useState(0);
 
-  static propTypes = {
-    id: PropTypes.number.isRequired,
-    timerData: PropTypes.shape({
-      hours: PropTypes.number,
-      minutes: PropTypes.number,
-      seconds: PropTypes.number,
-      intervalId: PropTypes.number,
-    }),
-    changeTimer: PropTypes.func.isRequired,
-  };
+  useEffect(() => {
+    setHours(hours);
+    setMinutes(minutes);
+    setSeconds(seconds);
+    setIntervalId(intervalId);
+  })
 
-  state = {
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    intervalId: 0,
-  };
-
-  componentDidMount() {
-    // записывает в state данные таймера из props
-    const { timerData } = this.props;
-    // const {timerData} = item
-    this.setState({
-      ...timerData,
-    });
-  }
-
-  // включает таймер
-  startTimer = () => {
-    const { intervalId } = this.state;
-
-    // очищаем интервал если он уже запущен
+  const startTimer = () => {
     if (intervalId) {
       clearInterval(intervalId);
-      this.setState({
-        intervalId: 0,
-      });
+      setIntervalId(0);
     }
-
     const newIntervalId = setInterval(() => {
-      const { seconds, minutes, hours } = this.state;
-
       if (seconds < 59) {
-        this.setState({
-          seconds: seconds + 1,
-        });
+        setSeconds(seconds => seconds + 1);
       } else {
-        this.setState({
-          minutes: minutes + 1,
-          seconds: 0,
-        });
-
+        setMinutes(minutes => minutes + 1);
+        setSeconds(0);
         if (minutes < 59) {
-          this.setState({
-            minutes: minutes + 1,
-          });
+          setMinutes(minutes =>minutes + 1);
         } else {
-          this.setState({
-            hours: hours + 1,
-            minutes: 0,
-          });
+          setHours(hours => hours + 1);
+          setMinutes(0);
         }
       }
     }, 1000);
 
     // записываем в intervalId результат выполнения ф-и setInterval
-    this.setState({
-      intervalId: newIntervalId,
-    });
+    setIntervalId(newIntervalId)
   };
 
-  // останавливает тайме
-  stopTimer = () => {
-    const { intervalId } = this.state;
-
+  const stopTimer = (props) => {
     if (intervalId) {
       clearInterval(intervalId);
-      this.setState({
-        intervalId: 0,
-      });
+      setIntervalId(0);
     }
 
     // при остановке таймера передаем его данные в компонент App
-    const { id, changeTimer } = this.props;
-    const newTimerData = { ...this.state };
+    const { id, changeTimer } = props;
+    const newTimerData = { hours, minutes, seconds, intervalId };
     changeTimer(id, newTimerData);
   };
 
-  // приобразует строки вывода таймера
-  strOutput = (val) => {
+  const strOutput = (val) => {
     const newStr = String(val);
     // eslint-disable-next-line prefer-template
     return newStr.length === 1 ? '0' + newStr : newStr;
   };
-
-  render() {
-    const { hours, minutes, seconds } = this.state;
-
-    const secondsOutput = this.strOutput(seconds);
-    const minutesOutput = this.strOutput(minutes);
-    const hoursOutput = this.strOutput(hours);
-
-    return (
-      <span className="description">
-        <button className="icon icon-play" type="button" aria-label="icon-play " onClick={this.startTimer} />
-        <button className="icon icon-pause" type="button" aria-label="icon-pause" onClick={this.stopTimer} />
-        {hoursOutput}:{minutesOutput}:{secondsOutput}
-      </span>
-    );
-  }
+  const secondsOutput = strOutput(seconds);
+  const minutesOutput = strOutput(minutes);
+  const hoursOutput = strOutput(hours);
+  return (
+    <span className="description">
+      <button className="icon icon-play" type="button" aria-label="icon-play " onClick={startTimer} />
+      <button className="icon icon-pause" type="button" aria-label="icon-pause" onClick={stopTimer} />
+      {hoursOutput}:{minutesOutput}:{secondsOutput}
+    </span>
+  )
 }
+
+export default Timer;

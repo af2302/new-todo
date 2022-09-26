@@ -1,3 +1,4 @@
+//disable-eslint-line
 import App from "./App";
 
 
